@@ -33,8 +33,8 @@ Run `train_and_evaluate_v2.py` using:
 
 ```bash
 python train_and_evaluate_v2.py \
-  --data_dir /Users/xujiaxuan/Desktop/si670finalproject-main/processed_data \
-  --output_dir /Users/xujiaxuan/Desktop/si670finalproject-main/outputs \
+  --data_dir your_path/processed_data \
+  --output_dir your_path/outputs \
   --rf_tune \
   --rf_n_iter 20 \
   --rf_cv_folds 3 \
