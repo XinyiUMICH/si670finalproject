@@ -1,0 +1,53 @@
+{
+  "regression": {
+    "valid_rf": {
+      "rmse": 0.5296026041975529,
+      "r2": 0.37671351472704473
+    },
+    "test_rf": {
+      "rmse": 0.5576286713421256,
+      "r2": 0.3872911623590458
+    },
+    "valid_lr": {
+      "rmse": 4.404121173426344,
+      "r2": -42.10285180049386
+    },
+    "test_lr": {
+      "rmse": 5.158931060151486,
+      "r2": -51.44250183920341
+    }
+  },
+  "ranking": {
+    "RandomForest": {
+      "mean_ndcg@5": 0.9742800915673188,
+      "mean_mrr": 0.9
+    },
+    "LinearRegression": {
+      "mean_ndcg@5": 0.9482616733218681,
+      "mean_mrr": 0.8
+    },
+    "Baseline (relevance_score)": {
+      "mean_ndcg@5": 0.9598881569141421,
+      "mean_mrr": 0.8891666666666665
+    }
+  },
+  "cv": {
+    "RandomForest": {
+      "rmse": 0.5362385081312389,
+      "r2": 0.33493284344907137
+    },
+    "LinearRegression": {
+      "rmse": 6.533796471535247,
+      "r2": -106.41935320454226
+    }
+  },
+  "meta": {
+    "rf_best_params": {
+      "n_estimators": 300,
+      "min_samples_split": 10,
+      "min_samples_leaf": 1,
+      "max_features": 0.2,
+      "max_depth": null
+    }
+  }
+}
