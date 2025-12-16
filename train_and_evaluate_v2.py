@@ -53,13 +53,12 @@ def parse_args():
         help="Number of CV folds for RF RandomizedSearchCV"
     )
 
-    # General cross-validation on the train set
+    # cross-validation 
     parser.add_argument(
         "--cv_folds", type=int, default=5,
         help="Number of folds for cross-validation evaluation on train set"
     )
 
-    # Error analysis options
     parser.add_argument(
         "--top_k_errors", type=int, default=20,
         help="Number of worst-predicted examples to save for error analysis"
@@ -142,7 +141,6 @@ def train_random_forest(
             n_jobs=-1,
         )
 
-        # Reasonable search space for tree-based models on TF-IDF features
         param_distributions = {
             "n_estimators": [100, 200, 300, 400],
             "max_depth": [None, 10, 20, 30],
@@ -346,7 +344,7 @@ def save_error_analysis(
     df["rf_abs_error"] = np.abs(df["y_true"] - df["rf_pred"])
     df["lr_abs_error"] = np.abs(df["y_true"] - df["lr_pred"])
 
-    # Save full error table
+    # full error table
     all_path = os.path.join(output_dir, "errors_all.csv")
     df.to_csv(all_path, index=False)
     print(f"Saved all errors to {all_path}")
@@ -368,10 +366,9 @@ def main():
     args = parse_args()
     os.makedirs(args.output_dir, exist_ok=True)
 
-    # 1. Load Data
     data = load_data(args.data_dir)
 
-    # 2. Train RandomForest (with optional hyperparameter tuning)
+    # RandomForest (with optional hyperparameter tuning)
     rf_model, rf_best_params = train_random_forest(
         data["X_train"],
         data["y_train"],
@@ -382,13 +379,12 @@ def main():
         rf_cv_folds=args.rf_cv_folds,
     )
 
-    # 3. Train Linear Regression
+    # Linear Regression
     lr_model = train_linear_regression(
         data["X_train"],
         data["y_train"],
     )
 
-    # 4. Save models
     print(f"Saving models to {args.output_dir}...")
     joblib.dump(rf_model, os.path.join(args.output_dir, "rf_model.joblib"))
     joblib.dump(lr_model, os.path.join(args.output_dir, "linreg_model.joblib"))
@@ -402,8 +398,7 @@ def main():
         },
     }
 
-    # 5. Cross-validation on train set (RF + LR)
-    # For RF, instantiate a fresh model with best params (if tuning was used)
+    # Cross-validation
     if rf_best_params is not None:
         rf_for_cv = RandomForestRegressor(
             **rf_best_params,
@@ -426,7 +421,6 @@ def main():
     )
     results["cv"]["RandomForest"] = rf_cv_scores
 
-    # For LR, use a fresh LinearRegression
     lr_for_cv = LinearRegression(n_jobs=-1)
     lr_cv_scores = run_cross_validation(
         lr_for_cv,
@@ -437,10 +431,10 @@ def main():
     )
     results["cv"]["LinearRegression"] = lr_cv_scores
 
-    # 6. Regression evaluation on Valid/Test
+    # Regression evaluation on Valid/Test
     print("\n--- Regression Evaluation ---")
 
-    # Random Forest predictions
+    # Random Forest 
     y_pred_valid_rf = rf_model.predict(data["X_valid"])
     y_pred_test_rf = rf_model.predict(data["X_test"])
 
@@ -451,7 +445,7 @@ def main():
         data["y_test"], y_pred_test_rf, "RF Test"
     )
 
-    # Linear Regression predictions
+    # Linear Regression 
     y_pred_valid_lr = lr_model.predict(data["X_valid"])
     y_pred_test_lr = lr_model.predict(data["X_test"])
 
@@ -462,7 +456,7 @@ def main():
         data["y_test"], y_pred_test_lr, "LR Test"
     )
 
-    # 7. Ranking evaluation (Test set only)
+    # Ranking evaluation
     print("\n--- Ranking Evaluation (Test Set) ---")
     ranking_scores = {
         "RandomForest": y_pred_test_rf,
@@ -477,7 +471,7 @@ def main():
     )
     results["ranking"] = ranking_metrics
 
-    # 8. Error analysis on Test set
+    # Error analysis
     save_error_analysis(
         questions=data["questions_test"],
         y_true=data["y_test"],
@@ -488,7 +482,6 @@ def main():
         top_k=args.top_k_errors,
     )
 
-    # 9. Save aggregated results (JSON)
     results_path = os.path.join(args.output_dir, "evaluation_results.json")
     print(f"Saving evaluation results to {results_path}...")
     with open(results_path, "w") as f:
